@@ -8,5 +8,9 @@ Para instalar as dependências do projeto, siga os passos abaixo:
 2. Navegue até o diretório do projeto.
 3. Execute o comando abaixo para instalar as dependências:
 
+## Padrão de Projeto
+
+Nome de Classes e Métodos - Primeira Letra Maiúscula
+
 ```sh
 npm install
