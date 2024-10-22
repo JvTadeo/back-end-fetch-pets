@@ -15,7 +15,6 @@ export class UserController {
         
         const { data, error } = await this.supabaseService.getUserData(id);
 
-        console.log(data);
         // Verificação de erro
         if (error) {
             res.status(400).json({ error: error.message });

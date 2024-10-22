@@ -6,5 +6,6 @@ const authController = new AuthController();
 
 authRouter.post('/login', authController.signIn);
 authRouter.post('/oauth', authController.signInWithAuth);
+authRouter.get('/check', authController.checkAuth);
 
 export default authRouter;

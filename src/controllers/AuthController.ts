@@ -13,6 +13,7 @@ export class AuthController {
         this.signIn = this.signIn.bind(this);
         this.signInWithAuth = this.signInWithAuth.bind(this);
         this.checkAuth = this.checkAuth.bind(this);
+        this.checkAuthMiddleware = this.checkAuthMiddleware.bind(this);
     }
 
     public async signIn(req: Request, res: Response) : Promise<void> {
@@ -40,7 +41,7 @@ export class AuthController {
         }
     }
 
-    public async checkAuth(req: Request, res: Response, next: NextFunction) : Promise<void> {
+    public async checkAuth(req: Request, res: Response) : Promise<void> {
         const token = req.headers.authorization?.split(' ')[1];
 
         if (!token) {
@@ -56,6 +57,23 @@ export class AuthController {
         }
 
         res.status(200).json({ user: data });
-        next()
+    }
+
+    public async checkAuthMiddleware(req: Request, res: Response, next: NextFunction) : Promise<void> {
+        const token = req.headers.authorization?.split(' ')[1];
+
+        if (!token) {
+            res.status(400).json({ error: "Token not provided" });
+            return;
+        }
+
+        const { data, error } = await this.supabaseService.getUser(token);
+
+        if (error) {
+            res.status(400).json({ error: error.message });
+            return;
+        }
+
+        next();
     }
 }
