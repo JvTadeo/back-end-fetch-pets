@@ -1,14 +1,14 @@
 export class UserData {
-    private profile : Object
+    private user : Object
     private token : string
 
     constructor(user : Object, token : string) {
-        this.profile = user;
+        this.user = user;
         this.token = token;
     }
 
     public getUserData() : Object {
-        return this.profile;
+        return this.user;
     }
 
     public getToken() : string {
@@ -16,7 +16,7 @@ export class UserData {
     }
 
     public setUserData(user : Object) : void {
-        this.profile = user;
+        this.user = user;
     }	
 
     public setToken(token : string) : void {

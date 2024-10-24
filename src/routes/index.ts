@@ -7,7 +7,6 @@ const router = Router();
 const authController = new AuthController();
 
 router.use('/auth', authRoute);
-
 // Verifica se o usuário está autenticado
 router.use(authController.checkAuthMiddleware);
 

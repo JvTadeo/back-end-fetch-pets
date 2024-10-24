@@ -12,8 +12,9 @@ export class UserController {
 
     public async getUser(req: Request, res: Response) : Promise<void> {
         const { id } = req.params;
-        
-        const { data, error } = await this.supabaseService.getUserData(id);
+        const token = req.headers.authorization?.split(' ')[1];
+
+        const { data, error } = await this.supabaseService.getUserData(id, token);
 
         // Verificação de erro
         if (error) {

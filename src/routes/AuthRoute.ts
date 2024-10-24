@@ -4,8 +4,11 @@ import { AuthController } from '../controllers/AuthController';
 const authRouter = Router();
 const authController = new AuthController();
 
-authRouter.post('/login', authController.signIn);
-authRouter.post('/oauth', authController.signInWithAuth);
 authRouter.get('/check', authController.checkAuth);
+authRouter.post('/login', authController.signIn);
+authRouter.post('/logout', authController.signOut);
+authRouter.post('/reset-password', authController.requestPasswordReset);
+authRouter.post('/verify-token', authController.verifyTokenOPT);
+
 
 export default authRouter;
