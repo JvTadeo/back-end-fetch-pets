@@ -1,4 +1,4 @@
-import { Provider, VerifyOtpParams, UserAttributes } from "@supabase/supabase-js";
+import { Provider, VerifyOtpParams, UserAttributes, AuthResponse } from "@supabase/supabase-js";
 import { createClient } from "@supabase/supabase-js";
 import dotenv from "dotenv";
 
@@ -67,11 +67,21 @@ export class SupaBaseService {
         return { data, error };
     }
 
-    public async resetPassword(token: string, password: string) : Promise<{ data: any; error: any }> {
-        const supabase = this.createAuthenticatedClient(token);
+    public async resetPassword(email:string, password: string, user: Object) : Promise<{ data: any; error: any }> {
+        const supabase = this.createAuthenticatedClient("");
 
-        const { data, error } = await supabase.auth.updateUser({
+        supabase.auth.setSession({
+            access_token: user["access_token"],
+            refresh_token: user["refresh_token"],
         });
+
+        const userAtributtes : UserAttributes = {
+            email: email,
+            password: password
+        }
+
+        const { data, error } = await supabase.auth.updateUser(userAtributtes);
+
         return { data, error };
     }
 }

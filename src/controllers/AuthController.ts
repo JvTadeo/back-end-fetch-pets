@@ -15,6 +15,7 @@ export class AuthController {
         this.checkAuth = this.checkAuth.bind(this);
         this.checkAuthMiddleware = this.checkAuthMiddleware.bind(this);
         this.requestPasswordReset = this.requestPasswordReset.bind(this);
+        this.resetPassword = this.resetPassword.bind(this);
         this.verifyTokenOPT = this.verifyTokenOPT.bind(this);
     }
 
@@ -98,6 +99,19 @@ export class AuthController {
         }
 
         res.status(200).json({ message: "Password reset requested" });
+    }
+
+    public async resetPassword(req: Request, res: Response) : Promise<void> {
+        const { password, email, user} = req.body;
+
+        const { error } = await this.supabaseService.resetPassword(email, password, user);
+
+        if (error) {
+            res.status(400).json({ error: error.message });
+            return;
+        }
+
+        res.status(200).json({ message: "Password reset" });
     }
 
     public async verifyTokenOPT(req: Request, res: Response) : Promise<void> {
