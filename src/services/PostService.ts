@@ -1,6 +1,7 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { Post } from "../models/PostModel";
 import logger from "../util/logger";
+import { getFilePath } from "./imageService"
 
 export class PostService {
     private createAuthenticatedClient(token: string): SupabaseClient {
@@ -11,6 +12,26 @@ export class PostService {
                 }
             }
         });
+    }
+
+    // Criar função para deletar imagem após post ser deletado
+
+    public async uploadFile(buffer: Buffer, filePath: string, contentType: string, isImage: boolean = true, token: string): Promise<{ data: any; error: any }> {
+        const supabase = this.createAuthenticatedClient(token);
+        filePath = getFilePath(filePath, isImage)
+        const { data, error } = await supabase.storage
+            .from('uploads')
+            .upload(filePath, buffer, {
+                contentType,
+                cacheControl: '3600',
+                upsert: true,
+            });
+
+        if (error) {
+            logger.error(`Error uploading file to Supabase: ${error.message}`);
+        }
+        logger.info(`Success a storage image: ${data}`);
+        return { data, error };
     }
 
     public async getById(id: string, token: string): Promise<{ data: Post; error: any }> {
@@ -85,18 +106,4 @@ export class PostService {
         }
         return { success: !error, error };
     }
-
-    // public async uploadFile(file: File, token: string):  Promise<{ success: boolean; error: any }> {
-    //     const supabase = this.createAuthenticatedClient(token);
-    //     // Define o caminho para a pasta `postImages`
-    //     const filePath = `postImages/${Date.now()}_${file.name}`;
-    //
-    //     // Faz upload do arquivo no Supabase Storage, dentro de `postImages`
-    //     const { data, error } = await supabase.storage
-    //         .from('uploads')
-    //         .upload(filePath, file);
-    //
-    //     if (error) throw new Error(`Error uploading file: ${error.message}`);
-    //     return data?.path ?? '';
-    // }
 }

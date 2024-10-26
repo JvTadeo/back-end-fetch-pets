@@ -1,6 +1,11 @@
 import { PostService } from "../services/PostService";
 import { Request, Response } from "express-serve-static-core";
 import logger from "../util/logger";
+import multer from "multer";
+import { determineFilePath } from "../services/imageService"
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 export class PostController {
     private postService: PostService;
@@ -70,11 +75,42 @@ export class PostController {
 
     public async createPost(req: Request, res: Response): Promise<void> {
         logger.info('Creating a new post');
-        const post = req.body;
         const token = this.getToken(req);
-        const { success, error } = await this.postService.create(post, token);
-        this.handleResponse(res, success, error, 'Post created successfully');
+
+        // Usa `upload.single` para capturar um único arquivo no campo `file`
+        upload.single('file')(req, res, async (err) => {
+            if (err) {
+                logger.error(`Error uploading file: ${err.message}`);
+                return res.status(400).json({ error: err.message });
+            }
+
+            const post = req.body;
+            const file = req.file;
+
+            if (file) {
+                const { buffer, originalname, mimetype } = file;
+
+                try {
+                    const { isImage, filePath } = determineFilePath(mimetype);
+                    const { data, error } = await this.postService.uploadFile(buffer, filePath, mimetype, isImage, token);
+
+                    if (error) {
+                        logger.error(`Error: ${error.message}`);
+                        return res.status(400).json({ error: error.message });
+                    }
+
+                    post.file = data.path;
+                } catch (e) {
+                    logger.error(`Error uploading file to Supabase: ${e.message}`);
+                    return res.status(500).json({ error: 'Error uploading file to storage.' });
+                }
+            }
+
+            const { success, error } = await this.postService.create(post, token);
+            this.handleResponse(res, success, error, 'Post created successfully');
+        });
     }
+
 
     public async updatePost(req: Request, res: Response): Promise<void> {
         logger.info(`Updating post by id: ${req.params.id}`);
