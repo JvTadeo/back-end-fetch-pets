@@ -7,8 +7,8 @@ const authController = new AuthController();
 authRouter.get('/check', authController.checkAuth);
 authRouter.post('/login', authController.signIn);
 authRouter.post('/logout', authController.signOut);
-authRouter.post('/reset-password', authController.requestPasswordReset);
+authRouter.post('/send-email-password', authController.requestPasswordReset);
 authRouter.post('/verify-token', authController.verifyTokenOPT);
-
+authRouter.post('/reset-password', authController.resetPassword);
 
 export default authRouter;
