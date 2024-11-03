@@ -1,11 +1,13 @@
-import { Provider, VerifyOtpParams, UserAttributes, AuthResponse } from "@supabase/supabase-js";
+import { VerifyOtpParams, UserAttributes} from "@supabase/supabase-js";
 import { createClient } from "@supabase/supabase-js";
+import { User } from "../models/User";
 import dotenv from "dotenv";
+import fs from "fs";
 
 // Load environment variables
 dotenv.config();
 
-export class SupaBaseService {
+export class AuthService {
 
     // Criando um SupaBaseService
     private createAuthenticatedClient(token: string) {
@@ -31,6 +33,15 @@ export class SupaBaseService {
         const supabase = this.createAuthenticatedClient(token);
         const { error } = await supabase.auth.signOut(token);
         return { data: null, error };
+    }
+
+    public async signUp(email: string, password: string) : Promise<{ data: any; error: any }> {
+        const supabase = this.createAuthenticatedClient("");
+        const { data, error } = await supabase.auth.signUp({
+            email: email,
+            password: password,
+        });
+        return { data, error };
     }
 
     public async getUserData(id : string, token: string) : Promise<{ data: any; error: any }> {
@@ -81,6 +92,54 @@ export class SupaBaseService {
         }
 
         const { data, error } = await supabase.auth.updateUser(userAtributtes);
+
+        return { data, error };
+    }
+
+    public async createUserDb(user: User, token: string, image: Image, uid: string) : Promise<{ data: any; error: any }> {
+        const supabase = this.createAuthenticatedClient(token);
+
+        // const imageAddress = supabase.storage.from('uploads/profiles').getPublicUrl(image.path).data.publicUrl;
+        let imageAddress = "" as string;
+
+        if (image) {
+            imageAddress = `profiles/${image.path}`;
+        }
+
+        const date = new Date(user.birthDate).toISOString();
+
+        console.log(date);
+        
+        const { data, error } = await supabase
+        .from('users')
+        .insert([
+            {
+                name: user.name,
+                image: imageAddress,
+                email: user.email,
+                address: user.address,
+                phoneNumber: user.phone,
+                gender: user.gender,
+                birthDate: date,
+                zip: user.zip,
+                stateAndCity: user.stateAndCity
+            }
+        ])
+        .select();        
+        return { data, error };
+    }
+
+    public async uploadImage(image: Image, token: string) : Promise<{ data: any; error: any }> {
+        const file = fs.readFileSync(image.path);
+
+        const supabase = this.createAuthenticatedClient(token);
+
+        const { data, error} = await supabase.storage
+        .from('uploads/profiles')
+        .upload(image.name, file, {
+            cacheControl: '3600',
+            upsert: false,
+        });
 
         return { data, error };
     }

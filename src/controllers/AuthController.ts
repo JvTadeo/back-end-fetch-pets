@@ -1,17 +1,20 @@
 import { Request, Response, NextFunction } from "express-serve-static-core";
-import { SupaBaseService } from "../services/SupaBaseService";
+import { AuthService } from "../services/AuthService";
 import { Provider, VerifyOtpParams } from "@supabase/supabase-js";
 import { UserData } from "../models/UserData";
+import { User } from "../models/User";
+import logger from "../util/logger";
 
 export class AuthController {
-    private supabaseService: SupaBaseService;
+    private supabaseService: AuthService;
 
     constructor() {
-        this.supabaseService = new SupaBaseService();
+        this.supabaseService = new AuthService();
 
         // Use o bind para garantir que o this seja o mesmo dentro do método
         this.signIn = this.signIn.bind(this);
         this.signOut = this.signOut.bind(this);
+        this.signUp = this.signUp.bind(this);
         this.checkAuth = this.checkAuth.bind(this);
         this.checkAuthMiddleware = this.checkAuthMiddleware.bind(this);
         this.requestPasswordReset = this.requestPasswordReset.bind(this);
@@ -50,6 +53,56 @@ export class AuthController {
         }
 
         res.status(200).json({ message: "User signed out" });
+    }
+
+    public async signUp(req: Request, res: Response) : Promise<void> {
+        const userData : User = req.body;
+        const { file } = req;
+
+        if (file) {
+            userData.image = { size: file.size, name: file.originalname, mimetype: file.mimetype, path: file.path };
+        }
+        // Chamando o método signUp do SupaBaseService
+        const { data, error } = await this.supabaseService.signUp(userData.email, userData.password);
+
+        // Verificando se ocorreu algum erro
+        if (error) {
+            logger.error(error.message);
+            res.status(400).json({ error: error.message });
+            return;
+        }
+
+        const uid = data.user.id;
+
+        logger.info("User created");
+
+        const token = data.session.access_token;
+
+        // Chamando o método uploadImage do SupaBaseService
+        if (userData.image) {
+            const { error } = await this.supabaseService.uploadImage(userData.image, token);
+            if (error) {
+                logger.error(error.message);
+                res.status(400).json({ error: error.message });
+                return;
+            }
+        }
+
+        logger.info("Image uploaded");
+
+        // Chamando o método createUser do SupaBaseService
+
+        const { error: errorCreateUser } = await this.supabaseService.createUserDb(userData, token, userData.image, uid);
+
+        if (errorCreateUser) {
+            logger.error(errorCreateUser.message);
+            res.status(400).json({ error: errorCreateUser.message });
+            return;
+        }
+
+        logger.info("User created in database");
+
+        res.status(200).json({ message: "User created" });
     }
 
     public async checkAuth(req: Request, res: Response) : Promise<void> {

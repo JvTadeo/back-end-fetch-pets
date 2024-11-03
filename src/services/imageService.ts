@@ -1,5 +1,3 @@
-
-
 export const getFilePath = (filePath, isImage)=>{
     return `/${filePath}/${(new Date()).getTime()}${isImage? '.png': '.mp4'}`;
 }
