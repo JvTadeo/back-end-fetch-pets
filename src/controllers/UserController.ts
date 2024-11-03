@@ -1,11 +1,11 @@
-import { SupaBaseService } from "../services/SupaBaseService";
+import { AuthService } from "../services/AuthService";
 import { Request, Response } from "express-serve-static-core";
 
 export class UserController {
-    private supabaseService: SupaBaseService;
+    private supabaseService: AuthService;
 
     constructor() {
-        this.supabaseService = new SupaBaseService();
+        this.supabaseService = new AuthService();
         // Use o bind para garantir que o this seja o mesmo dentro do método
         this.getUser = this.getUser.bind(this);
     }
@@ -15,7 +15,7 @@ export class UserController {
         const token = req.headers.authorization?.split(' ')[1];
 
         const { data, error } = await this.supabaseService.getUserData(id, token);
-
+        
         // Verificação de erro
         if (error) {
             res.status(400).json({ error: error.message });
@@ -28,6 +28,8 @@ export class UserController {
             console.log("User not found");
             return;
         }
+
+        console.log(data);
 
         res.status(200).json({ user: data });
     }

@@ -1,9 +1,10 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
-import { Post } from "../models/PostModel";
+import { Post } from "../interfaces/PostInterface";
 import logger from "../util/logger";
 import { getFilePath } from "./imageService"
 
 export class PostService {
+
     private createAuthenticatedClient(token: string): SupabaseClient {
         return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY, {
             global: {
