@@ -1,15 +1,15 @@
 import { FavoriteService } from "../services/FavoriteService";
 import { Request, Response } from "express-serve-static-core";
 import logger from "../util/logger";
-import { SupaBaseService } from "../services/SupaBaseService"
+import { AuthService } from "../services/AuthService";
 
 export class FavoriteController {
     private favoriteService: FavoriteService;
-    private supaBaseService: SupaBaseService
+    private supaBaseService: AuthService
 
     constructor() {
         this.favoriteService = new FavoriteService();
-        this.supaBaseService = new SupaBaseService();
+        this.supaBaseService = new AuthService();
         this.createFavorite = this.createFavorite.bind(this);
         this.getFavoriteById = this.getFavoriteById.bind(this);
         this.getFavoritesByUser = this.getFavoritesByUser.bind(this);
