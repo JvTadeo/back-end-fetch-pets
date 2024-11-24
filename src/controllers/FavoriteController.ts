@@ -1,7 +1,7 @@
 import { FavoriteService } from "../services/FavoriteService";
 import { Request, Response } from "express-serve-static-core";
 import logger from "../util/logger";
-import { AuthService } from "../services/AuthService";
+import { AuthService } from "../services/AuthService"
 
 export class FavoriteController {
     private favoriteService: FavoriteService;
