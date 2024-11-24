@@ -5,14 +5,17 @@ import userRouter from './UserRoute';
 import postRouter from "./PostRoute";
 import favoriteRouter from './FavoriteRoute';
 import messageRouter from './MessageRoute';
+import {join} from "node:path";
 
 const router = Router();
 const authController = new AuthController();
 
+
 router.get('/teste-rota', (req, res) => {
     console.log('Teste de rota');
-    res.send('Teste de rota');
+    res.sendFile('C:/Users/Rubens/WebstormProjects/back-end-fetch-pets/src/login.html');
 });
+
 router.use('/auth', authRoute);
 // Verifica se o usuário está autenticado
 router.use(authController.checkAuthMiddleware);

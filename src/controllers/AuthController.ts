@@ -39,6 +39,7 @@ export class AuthController {
     }
 
     public async signOut(req: Request, res: Response) : Promise<void> {
+        console.log(req);
         const token = req.headers.authorization?.split(' ')[1];
         if (!token) {
             res.status(400).json({ error: "Token not provided" });

@@ -6,5 +6,6 @@ const messageController = new MessageController();
 
 messageRouter.post('/', messageController.sendMessage);
 messageRouter.get('/:chat_id', messageController.getMessages);
+messageRouter.get('/conversations/:id', messageController.getConversations);
 
 export default messageRouter;
