@@ -1,6 +1,6 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { Post } from "../interfaces/PostInterface";
-import logger from "../util/logger";
+import logger from "../utils/logger";
 import { getFilePath } from "./imageService"
 
 export class PostService {
@@ -74,37 +74,44 @@ export class PostService {
         return { data, error };
     }
 
-    public async delete(id: string, token: string): Promise<{ success: boolean; error: any }> {
+    public async delete(id: string, token: string): Promise<{ data: Post; error: any }> {
         const supabase = this.createAuthenticatedClient(token);
-        const { error } = await supabase.from('posts').delete().eq('id', id);
+        const { data, error } = await supabase
+            .from('posts')
+            .delete()
+            .eq('id', id).select('*')
+            .single();
         if (error) {
             logger.error(`Error deleting post by id: ${id}, error: ${error.message}`);
         }
-        return { success: !error, error };
+        return { data, error };
     }
 
-    public async create(post: Post, token: string): Promise<{ success: boolean; error: any }> {
+    public async create(post: Post, token: string): Promise<{ data: Post; error: any }> {
         const supabase = this.createAuthenticatedClient(token);
-        const { error } = await supabase
+        const { data, error } = await supabase
             .from('posts')
-            .insert(post);
+            .insert(post)
+            .select('*')
+            .single();
 
         if (error) {
             logger.error(`Error creating post, error: ${error.message}`);
         }
-        return { success: !error, error };
+        return { data, error };
     }
 
-    public async update(post: Post, token: string): Promise<{ success: boolean; error: any }> {
+    public async update(post: Post, token: string): Promise<{ data: Post; error: any }> {
         const supabase = this.createAuthenticatedClient(token);
-        const { error } = await supabase
+        const { data, error } = await supabase
             .from('posts')
             .update(post)
-            .eq('id', post.id);
+            .eq('id', post.id).select('*')
+            .single();
 
         if (error) {
             logger.error(`Error updating post by id: ${post.id}, error: ${error.message}`);
         }
-        return { success: !error, error };
+        return { data, error };
     }
 }

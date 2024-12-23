@@ -4,9 +4,9 @@ import { FavoriteController } from '../controllers/FavoriteController';
 const favoriteRouter = Router();
 const favoriteController = new FavoriteController();
 
-favoriteRouter.post('/', favoriteController.createFavorite);
-favoriteRouter.delete('/:id', favoriteController.deleteFavorite);
-favoriteRouter.get('/:id', favoriteController.getFavoriteById);
-favoriteRouter.get('/user/:id', favoriteController.getFavoritesByUser);
+favoriteRouter.post('/', favoriteController.create);
+favoriteRouter.delete('/:id', favoriteController.delete);
+favoriteRouter.get('/:id', favoriteController.getById);
+favoriteRouter.get('/user/:id', favoriteController.getByUser);
 
 export default favoriteRouter;

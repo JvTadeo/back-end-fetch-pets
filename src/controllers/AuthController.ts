@@ -3,7 +3,7 @@ import { AuthService } from "../services/AuthService";
 import { Provider, VerifyOtpParams } from "@supabase/supabase-js";
 import { UserData } from "../models/UserData";
 import { User } from "../models/User";
-import logger from "../util/logger";
+import logger from "../utils/logger";
 
 export class AuthController {
     private supabaseService: AuthService;
