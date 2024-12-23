@@ -1,5 +1,5 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
-import logger from "../util/logger";
+import logger from "../utils/logger";
 import { Message } from "../interfaces/MessageInterface";
 import { MessageServiceInterface } from '../interfaces/MessageServiceInterface';
 
@@ -32,16 +32,18 @@ export class MessageService implements MessageServiceInterface {
         return { data, error };
     }
 
-    public async create(message: Message, token: string): Promise<{ success: boolean; error: any }> {
+    public async create(message: Message, token: string): Promise<{ data: Message, error: any }> {
         const supabase = this.createAuthenticatedClient(token);
         const { data, error } = await supabase
             .from('messages')
-            .insert([message]);
+            .insert([message])
+            .select("*")
+            .single();
 
         if (error) {
             logger.error(`Error creating message(${message}): message: ${error.message}`);
         }
-        return { success: !error, error };
+        return { data, error };
     }
 
     public async getConversations(userId: string, token: string): Promise<{ data: any[]; error: any }> {

@@ -1,6 +1,6 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { Favorite } from "../interfaces/FavoriteInterface";
-import logger from "../util/logger";
+import logger from "../utils/logger";
 
 export class FavoriteService {
 
@@ -14,29 +14,32 @@ export class FavoriteService {
         });
     }
 
-    public async create(favorite: Favorite, token: string): Promise<{ success: boolean; error: any }> {
+    public async create(favorite: Favorite, token: string): Promise<{ data: Favorite; error: any }> {
         const supabase = this.createAuthenticatedClient(token);
-        const { error } = await supabase
+        const { data, error } = await supabase
             .from('postLikes')
-            .insert(favorite);
+            .insert(favorite)
+            .select('*')
+            .single();
 
         if (error) {
             logger.error(`Error creating favorite, error: ${error.message}`);
         }
-        return { success: !error, error };
+        return { data, error };
     }
 
-    public async delete(id: string, token: string): Promise<{ success: boolean; error: any }> {
+    public async delete(id: string, token: string): Promise<{ data: Favorite; error: any }> {
         const supabase = this.createAuthenticatedClient(token);
-        const { error } = await supabase
+        const { data, error } = await supabase
             .from('postLikes')
             .delete()
-            .eq('id', id);
+            .eq('id', id).select('*')
+            .single();
 
         if (error) {
             logger.error(`Error deleting favorite, error: ${error.message}`);
         }
-        return { success: !error, error };
+        return { data, error };
     }
 
     public async getByUserId(id: string, token: string): Promise<{ data: Favorite[]; error: any }> {

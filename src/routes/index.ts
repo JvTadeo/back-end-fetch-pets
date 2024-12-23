@@ -20,7 +20,7 @@ router.use('/auth', authRoute);
 // Verifica se o usuário está autenticado
 router.use(authController.checkAuthMiddleware);
 
-router.use('/user', userRouter);
+router.use('/users', userRouter);
 router.use('/posts', postRouter);
 router.use('/favorites', favoriteRouter);
 router.use('/messages', messageRouter);
