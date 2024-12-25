@@ -1,5 +1,4 @@
-import crypto from 'crypto';
-
+import crypto from "crypto";
 
 export const generateChatUUID = (user1_id: string, user2_id: string): string => {
     // Combina os IDs de forma consistente
