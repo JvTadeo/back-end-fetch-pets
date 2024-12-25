@@ -8,7 +8,7 @@ export class UserData {
     }
 
     public getUserData() : Object {
-        return this.user;
+        return { user: this.user, token: this.token };
     }
 
     public getToken() : string {

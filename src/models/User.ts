@@ -9,7 +9,7 @@ export class User {
     address: string;
     stateAndCity: string;
     zip: string;
-    image: Image;
+    image: string;
     politycs: boolean;
 
     constructor(
@@ -23,7 +23,7 @@ export class User {
         address: string = "",
         stateAndCity: string = "",
         zip: string = "",
-        image: Image = { name: "", path: "", mimetype: "", size: 0 },
+        image: string = "",
         politycs: boolean = false
     ) {
         this.name = name;

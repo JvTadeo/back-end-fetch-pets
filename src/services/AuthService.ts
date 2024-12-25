@@ -96,51 +96,57 @@ export class AuthService {
         return { data, error };
     }
 
-    public async createUserDb(user: User, token: string, image: Image, uid: string) : Promise<{ data: any; error: any }> {
+    public async updateUserDb(user: User, token: string, uid: string) : Promise<{ data: any; error: any }> {
         const supabase = this.createAuthenticatedClient(token);
 
-        // const imageAddress = supabase.storage.from('uploads/profiles').getPublicUrl(image.path).data.publicUrl;
-        let imageAddress = "" as string;
-
-        if (image) {
-            imageAddress = `profiles/${image.path}`;
-        }
-
-        const date = new Date(user.birthDate).toISOString();
-
-        console.log(date);
+        const dateObj = new Date(user.birthDate);
+        const date = `${dateObj.getDate().toString().padStart(2, '0')}/${(dateObj.getMonth() + 1).toString().padStart(2, '0')}/${dateObj.getFullYear()}`;
         
         const { data, error } = await supabase
         .from('users')
-        .insert([
-            {
-                name: user.name,
-                image: imageAddress,
-                email: user.email,
-                address: user.address,
-                phoneNumber: user.phone,
-                gender: user.gender,
-                birthDate: date,
-                zip: user.zip,
-                stateAndCity: user.stateAndCity
-            }
-        ])
-        .select();        
+        .update({
+            name: user.name,
+            email: user.email,
+            address: user.address,
+            phoneNumber: user.phone,
+            gender: user.gender,
+            birthDate: date,
+            zip: user.zip,
+            stateAndCity: user.stateAndCity,
+            image: user.image,
+        })
+        .eq('id', uid)
+        .select();
+
         return { data, error };
     }
 
-    public async uploadImage(image: Image, token: string) : Promise<{ data: any; error: any }> {
-        const file = fs.readFileSync(image.path);
-
+    public async saveImageToSupabase(image: any, token: string, uid: string) : Promise<{ data: any; error: any }> {
         const supabase = this.createAuthenticatedClient(token);
 
-        const { data, error} = await supabase.storage
-        .from('uploads/profiles')
-        .upload(image.name, file, {
-            cacheControl: '3600',
-            upsert: false,
-        });
+        const { data, error } = await supabase
+        .from('users')
+        .update({
+            image: image,
+        })
+        .eq('id', uid)
+        .select();
 
         return { data, error };
     }
+
+    // public async uploadImage(image: Image, token: string) : Promise<{ data: any; error: any }> {
+    //     const file = fs.readFileSync(image.path);
+
+    //     const supabase = this.createAuthenticatedClient(token);
+
+    //     const { data, error} = await supabase.storage
+    //     .from('uploads/profiles')
+    //     .upload(image.name, file, {
+    //         cacheControl: '3600',
+    //         upsert: false,
+    //     });
+
+    //     return { data, error };
+    // }
 }

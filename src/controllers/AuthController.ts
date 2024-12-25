@@ -20,6 +20,7 @@ export class AuthController {
         this.requestPasswordReset = this.requestPasswordReset.bind(this);
         this.resetPassword = this.resetPassword.bind(this);
         this.verifyTokenOPT = this.verifyTokenOPT.bind(this);
+        this.saveImageToSupabase = this.saveImageToSupabase.bind(this);
     }
 
     public async signIn(req: Request, res: Response) : Promise<void> {
@@ -31,11 +32,10 @@ export class AuthController {
             res.status(400).json({ error: error });
             return
         }
-
         userData.setToken(data.session.access_token);
         userData.setUserData(data.user);
 
-        res.status(200).json({ user: userData });
+        res.status(200).json({ user: userData.getUserData() });
     }
 
     public async signOut(req: Request, res: Response) : Promise<void> {
@@ -58,11 +58,7 @@ export class AuthController {
 
     public async signUp(req: Request, res: Response) : Promise<void> {
         const userData : User = req.body;
-        const { file } = req;
 
-        if (file) {
-            userData.image = { size: file.size, name: file.originalname, mimetype: file.mimetype, path: file.path };
-        }
         // Chamando o método signUp do SupaBaseService
         const { data, error } = await this.supabaseService.signUp(userData.email, userData.password);
 
@@ -74,26 +70,14 @@ export class AuthController {
         }
 
         const uid = data.user.id;
-
+        
         logger.info("User created");
 
         const token = data.session.access_token;
 
-        // Chamando o método uploadImage do SupaBaseService
-        if (userData.image) {
-            const { error } = await this.supabaseService.uploadImage(userData.image, token);
-            if (error) {
-                logger.error(error.message);
-                res.status(400).json({ error: error.message });
-                return;
-            }
-        }
-
-        logger.info("Image uploaded");
-
         // Chamando o método createUser do SupaBaseService
 
-        const { error: errorCreateUser } = await this.supabaseService.createUserDb(userData, token, userData.image, uid);
+        const { error: errorCreateUser } = await this.supabaseService.updateUserDb(userData, token, uid);
 
         if (errorCreateUser) {
             logger.error(errorCreateUser.message);
@@ -103,7 +87,7 @@ export class AuthController {
 
         logger.info("User created in database");
 
-        res.status(200).json({ message: "User created" });
+        res.status(200).json({ message: "User created", token: token, user: data.user });
     }
 
     public async checkAuth(req: Request, res: Response) : Promise<void> {
@@ -184,6 +168,18 @@ export class AuthController {
             return;
         }
 
+        res.status(200).json({ data });
+    }
+
+    public async saveImageToSupabase(req: Request, res: Response) : Promise<void> {
+        const { token, image, uid } = req.body;
+        
+        const { data, error } = await this.supabaseService.saveImageToSupabase(image, token, uid);
+
+        if (error) {
+            res.status(400).json({ error: error.message });
+            return;
+        }
         res.status(200).json({ data });
     }
 }
