@@ -9,10 +9,6 @@ import messageRouter from './MessageRoute';
 const router = Router();
 const authController = new AuthController();
 
-router.get('/teste-rota', (req, res) => {
-    console.log('Teste de rota');
-    res.send('Teste de rota');
-});
 router.use('/auth', authRoute);
 // Verifica se o usuário está autenticado
 router.use(authController.checkAuthMiddleware);
