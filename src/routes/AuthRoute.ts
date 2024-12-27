@@ -14,4 +14,7 @@ authRouter.post('/send-email-password', authController.requestPasswordReset);
 authRouter.post('/verify-token', authController.verifyTokenOPT);
 authRouter.post('/reset-password', authController.resetPassword);
 authRouter.post('/save-image', authController.saveImageToSupabase);
+
+authRouter.put('/update', authController.updateUser);
+
 export default authRouter;

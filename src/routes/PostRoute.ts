@@ -10,5 +10,5 @@ postRouter.get('/:id', postController.getPostById);
 postRouter.patch('/:id', postController.updatePost)
 postRouter.delete('/:id', postController.deletePost);
 postRouter.get('/user/:id', postController.getPostsByUser);
-
+postRouter.get('/adopted/:id', postController.getAdoptedPosts);
 export default postRouter;

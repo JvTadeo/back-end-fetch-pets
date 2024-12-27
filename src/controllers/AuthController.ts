@@ -21,25 +21,34 @@ export class AuthController {
         this.resetPassword = this.resetPassword.bind(this);
         this.verifyTokenOPT = this.verifyTokenOPT.bind(this);
         this.saveImageToSupabase = this.saveImageToSupabase.bind(this);
+        this.updateUser = this.updateUser.bind(this);
     }
 
     public async signIn(req: Request, res: Response) : Promise<void> {
         const { email, password } = req.body;
         let userData = new UserData({}, "");
 
-        const { data, error } = await this.supabaseService.signInWithPassword(email, password);
-        if (error) {
-            res.status(400).json({ error: error });
+        const {data:loginData, error:loginError } = await this.supabaseService.signInWithPassword(email, password);
+
+        if (loginError) {
+            res.status(400).json({ error: loginError });
             return
         }
-        userData.setToken(data.session.access_token);
-        userData.setUserData(data.user);
+
+        const { data, error } = await this.supabaseService.getUser(loginData.session.access_token);
+
+        if (error) {
+            res.status(400).json({ error: error.message });
+            return;
+        }
+
+        userData.setToken(loginData.session.access_token);
+        userData.setUserData(data);
 
         res.status(200).json({ user: userData.getUserData() });
     }
 
     public async signOut(req: Request, res: Response) : Promise<void> {
-        console.log(req);
         const token = req.headers.authorization?.split(' ')[1];
         if (!token) {
             res.status(400).json({ error: "Token not provided" });
@@ -92,6 +101,7 @@ export class AuthController {
 
     public async checkAuth(req: Request, res: Response) : Promise<void> {
         const token = req.headers.authorization?.split(' ')[1];
+        let userData = new UserData({}, "");
 
         if (!token) {
             res.status(400).json({ error: "Token not provided" });
@@ -105,7 +115,10 @@ export class AuthController {
             return;
         }
 
-        res.status(200).json({ user: data });
+        userData.setToken(token);
+        userData.setUserData(data);
+
+        res.status(200).json({ user: userData.getUserData() });
     }
 
     public async checkAuthMiddleware(req: Request, res: Response, next: NextFunction) : Promise<void> {
@@ -181,5 +194,9 @@ export class AuthController {
             return;
         }
         res.status(200).json({ data });
+    }
+
+    public async updateUser(req: Request, res: Response) : Promise<void> {
+
     }
 }

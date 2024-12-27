@@ -18,6 +18,7 @@ export class PostController extends BaseController {
         this.getPostById = this.getPostById.bind(this);
         this.getPostsByUser = this.getPostsByUser.bind(this);
         this.getAllPosts = this.getAllPosts.bind(this);
+        this.getAdoptedPosts = this.getAdoptedPosts.bind(this);
         this.deletePost = this.deletePost.bind(this);
         this.createPost = this.createPost.bind(this);
         this.updatePost = this.updatePost.bind(this);
@@ -44,6 +45,14 @@ export class PostController extends BaseController {
         const token = await this.getToken(req);
         const { data, error } = await this.postService.getAll(token);
         await this.handleResponse(res, data, !!data, error, 'Posts retrieved successfully');
+    }
+
+    public async getAdoptedPosts(req: Request, res: Response): Promise<void> {
+        logger.info('Fetching all adopted posts');
+        const token = await this.getToken(req);
+        const { id } = req.params;
+        const { data, error } = await this.postService.getAdoptedPosts(token, id);
+        await this.handleResponse(res, data, !!data, error, 'Adopted Posts retrieved successfully');
     }
 
     public async deletePost(req: Request, res: Response): Promise<void> {

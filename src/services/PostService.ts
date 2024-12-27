@@ -74,6 +74,19 @@ export class PostService {
         return { data, error };
     }
 
+    public async getAdoptedPosts(token: string, uid: string): Promise<{ data: Post[]; error: any }> {
+        const supabase = this.createAuthenticatedClient(token);
+        const { data, error } = await supabase
+            .from('posts')
+            .select()
+            .eq('adopter', uid);
+
+        if (error) {
+            logger.error('Error fetching all adopted posts, error: ${error.message}');
+        }
+        return { data, error };
+    }
+
     public async delete(id: string, token: string): Promise<{ data: Post; error: any }> {
         const supabase = this.createAuthenticatedClient(token);
         const { data, error } = await supabase
