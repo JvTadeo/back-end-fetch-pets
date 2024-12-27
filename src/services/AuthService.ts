@@ -57,7 +57,14 @@ export class AuthService {
 
     public async getUser(token: string) : Promise<{ data: any; error: any }> {
         const supabase = this.createAuthenticatedClient(token);
-        const { data, error } = await supabase.auth.getUser(token);
+        const { data:user, error:userErro } = await supabase.auth.getUser(token);
+        
+        if (userErro) {
+            return { data: null, error: userErro };
+        }
+
+        const { data, error} = await this.getUserData(user.user.id, token);
+
         return { data, error };
     }
 

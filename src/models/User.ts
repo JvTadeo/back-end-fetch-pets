@@ -11,6 +11,7 @@ export class User {
     zip: string;
     image: string;
     politycs: boolean;
+    houseNumber: number;
 
     constructor(
         name: string = "",
@@ -24,7 +25,8 @@ export class User {
         stateAndCity: string = "",
         zip: string = "",
         image: string = "",
-        politycs: boolean = false
+        politycs: boolean = false,
+        houseNumber = 0
     ) {
         this.name = name;
         this.email = email;
@@ -38,5 +40,6 @@ export class User {
         this.zip = zip;
         this.image = image;
         this.politycs = politycs;
+        this.houseNumber = houseNumber;
     }
 }
