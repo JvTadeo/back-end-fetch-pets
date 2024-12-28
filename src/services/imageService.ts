@@ -1,4 +1,4 @@
-export const getFilePath = (filePath, isImage)=>{
+export const getFilePath = (filePath: string, isImage: boolean)=>{
     return `/${filePath}/${(new Date()).getTime()}${isImage? '.png': '.mp4'}`;
 }
 

@@ -1,21 +1,12 @@
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { Favorite } from "../interfaces/FavoriteInterface";
 import logger from "../utils/logger";
+import {FavoriteServiceInterface} from "../interfaces/FavoriteServiceInterface";
+import {BaseService} from "./BaseService";
 
-export class FavoriteService {
-
-    private createAuthenticatedClient(token: string): SupabaseClient {
-        return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY, {
-            global: {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            }
-        });
-    }
+export class FavoriteService extends BaseService implements FavoriteServiceInterface {
 
     public async create(favorite: Favorite, token: string): Promise<{ data: Favorite; error: any }> {
-        const supabase = this.createAuthenticatedClient(token);
+        const supabase = await this.createAuthenticatedClient(token);
         const { data, error } = await supabase
             .from('postLikes')
             .insert(favorite)
@@ -29,7 +20,7 @@ export class FavoriteService {
     }
 
     public async delete(id: string, token: string): Promise<{ data: Favorite; error: any }> {
-        const supabase = this.createAuthenticatedClient(token);
+        const supabase = await this.createAuthenticatedClient(token);
         const { data, error } = await supabase
             .from('postLikes')
             .delete()
@@ -43,7 +34,7 @@ export class FavoriteService {
     }
 
     public async getByUserId(id: string, token: string): Promise<{ data: Favorite[]; error: any }> {
-        const supabase = this.createAuthenticatedClient(token);
+        const supabase = await this.createAuthenticatedClient(token);
         const { data, error } = await supabase
             .from('postLikes')
             .select('*')
@@ -56,11 +47,13 @@ export class FavoriteService {
     }
 
     public async getById(id: string, token: string): Promise<{ data: Favorite[]; error: any }> {
-        const supabase = this.createAuthenticatedClient(token);
+        const supabase = await this.createAuthenticatedClient(token);
         const { data, error } = await supabase
             .from('postLikes')
             .select()
             .eq('id', id);
+
+        console.log(data);
 
         if (error) {
             logger.error(`Error getting favorites by ID, error: ${error.message}`);

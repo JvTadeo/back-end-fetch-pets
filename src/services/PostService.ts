@@ -1,24 +1,13 @@
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { Post } from "../interfaces/PostInterface";
 import logger from "../utils/logger";
 import { getFilePath } from "./imageService"
+import {BaseService} from "./BaseService";
 
-export class PostService {
-
-    private createAuthenticatedClient(token: string): SupabaseClient {
-        return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY, {
-            global: {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            }
-        });
-    }
+export class PostService extends BaseService {
 
     // Criar função para deletar imagem após post ser deletado
-
     public async uploadFile(buffer: Buffer, filePath: string, contentType: string, isImage: boolean = true, token: string): Promise<{ data: any; error: any }> {
-        const supabase = this.createAuthenticatedClient(token);
+        const supabase = await this.createAuthenticatedClient(token);
         filePath = getFilePath(filePath, isImage)
         const { data, error } = await supabase.storage
             .from('uploads')
@@ -36,7 +25,7 @@ export class PostService {
     }
 
     public async getById(id: string, token: string): Promise<{ data: Post; error: any }> {
-        const supabase = this.createAuthenticatedClient(token);
+        const supabase = await this.createAuthenticatedClient(token);
         const { data, error } = await supabase
             .from('posts')
             .select()
@@ -50,7 +39,7 @@ export class PostService {
     }
 
     public async getByUserId(id: string, token: string): Promise<{ data: Post[]; error: any }> {
-        const supabase = this.createAuthenticatedClient(token);
+        const supabase = await this.createAuthenticatedClient(token);
         const { data, error } = await supabase
             .from('posts')
             .select()
@@ -63,7 +52,7 @@ export class PostService {
     }
 
     public async getAll(token: string): Promise<{ data: Post[]; error: any }> {
-        const supabase = this.createAuthenticatedClient(token);
+        const supabase = await this.createAuthenticatedClient(token);
         const { data, error } = await supabase
             .from('posts')
             .select();
@@ -75,7 +64,7 @@ export class PostService {
     }
 
     public async getAdoptedPosts(token: string, uid: string): Promise<{ data: Post[]; error: any }> {
-        const supabase = this.createAuthenticatedClient(token);
+        const supabase = await this.createAuthenticatedClient(token);
         const { data, error } = await supabase
             .from('posts')
             .select()
@@ -88,7 +77,7 @@ export class PostService {
     }
 
     public async delete(id: string, token: string): Promise<{ data: Post; error: any }> {
-        const supabase = this.createAuthenticatedClient(token);
+        const supabase = await this.createAuthenticatedClient(token);
         const { data, error } = await supabase
             .from('posts')
             .delete()
@@ -101,7 +90,7 @@ export class PostService {
     }
 
     public async create(post: Post, token: string): Promise<{ data: Post; error: any }> {
-        const supabase = this.createAuthenticatedClient(token);
+        const supabase = await this.createAuthenticatedClient(token);
         const { data, error } = await supabase
             .from('posts')
             .insert(post)
@@ -115,7 +104,7 @@ export class PostService {
     }
 
     public async update(post: Post, token: string): Promise<{ data: Post; error: any }> {
-        const supabase = this.createAuthenticatedClient(token);
+        const supabase = await this.createAuthenticatedClient(token);
         const { data, error } = await supabase
             .from('posts')
             .update(post)

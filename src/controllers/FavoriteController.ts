@@ -17,36 +17,84 @@ export class FavoriteController extends BaseController {
     }
 
     public async create(req: Request, res: Response): Promise<void> {
-        logger.info(`Adding post with id ${req.params.id} to favorites`);
-        const { postId } = req.body;
-        const token = await this.getToken(req);
-        const userId = await this.getUserId(token)
-        const favorite = {created_at: new Date(), postId: Number(postId), userId: userId}
-        const { data, error } = await this.favoriteService.create(favorite, token);
-        await this.handleResponse(res, data, !!data, error, 'Post added to favorites');
+        try {
+            logger.info(`Adding post with id ${req.params.id} to favorites`);
+            const { postId } = req.body;
+            const token = await this.getToken(req);
+            const userId = await this.getUserId(token);
+            const favorite = { created_at: new Date(), postId: Number(postId), userId, };
+            const { data, error } = await this.favoriteService.create(favorite, token);
+
+            await this.handleResponse(res, {
+                data,
+                success: !!data && !error,
+                error: error ? { message: error.message, status: error.status || 400 } : undefined,
+                message: 'Post added to favorites successfully',
+                entity: 'Favorite',
+            });
+        } catch (err) {
+            logger.error(`Unexpected error while adding favorite: ${err.message}`);
+            res.status(err.status).json({ error: err.message });
+        }
     }
 
     public async delete(req: Request, res: Response): Promise<void> {
-        logger.info(`Removing post with id ${req.params.id} from favorites`);
-        const { id } = req.params;
-        const token = await this.getToken(req);
-        const { data, error } = await this.favoriteService.delete(id, token);
-        await this.handleResponse(res, data, !!data, error, 'Post removed from favorites');
+        try {
+            logger.info(`Removing post with id ${req.params.id} from favorites`);
+            const { id } = req.params;
+            const token = await this.getToken(req);
+            const { data, error } = await this.favoriteService.delete(id, token);
+
+            await this.handleResponse(res, {
+                data,
+                success: !!data && !error, // Valida se não houve erro e se os dados estão presentes
+                error: error ? { message: error.message, status: error.status || 400 } : undefined,
+                message: 'Post removed from favorites successfully',
+                entity: 'Favorite',
+            });
+        } catch (err) {
+            logger.error(`Unexpected error while removing favorite: ${err.message}`);
+            res.status(err.status).json({ error: err.message });
+        }
     }
 
     public async getByUser(req: Request, res: Response): Promise<void> {
-        logger.info(`Fetching favorites for user with id ${req.params.id}`);
-        const { id } = req.params;
-        const token = await this.getToken(req);
-        const { data, error } = await this.favoriteService.getByUserId(id, token);
-        await this.handleResponse(res, data, !!data, error, 'Favorites retrieved successfully');
+        try {
+            logger.info(`Fetching favorites for user with id ${req.params.id}`);
+            const { id } = req.params;
+            const token = await this.getToken(req);
+            const { data, error } = await this.favoriteService.getByUserId(id, token);
+
+            await this.handleResponse(res, {
+                data,
+                success: !!data && !error,
+                error: error ? { message: error.message, status: error.status || 404 } : undefined,
+                message: 'Favorites retrieved successfully',
+                entity: 'Favorite',
+            });
+        } catch (err) {
+            logger.error(`Unexpected error while fetching favorites for user: ${err.message}`);
+            res.status(err.status).json({ error: err.message });
+        }
     }
 
     public async getById(req: Request, res: Response): Promise<void> {
-        logger.info(`Fetching favorite with id ${req.params.id}`);
-        const { id } = req.params;
-        const token = await this.getToken(req);
-        const { data, error } = await this.favoriteService.getById(id, token);
-        await this.handleResponse(res, data, !!data, error, 'Favorite retrieved successfully');
+        try {
+            logger.info(`Fetching favorite with id ${req.params.id}`);
+            const { id } = req.params;
+            const token = await this.getToken(req);
+            const { data, error } = await this.favoriteService.getById(id, token);
+
+            await this.handleResponse(res, {
+                data,
+                success: !!data && !error,
+                error: error ? { message: error.message, status: error.status || 404 } : undefined,
+                message: 'Favorite retrieved successfully',
+                entity: 'Favorite',
+            });
+        } catch (err) {
+            logger.error(`Unexpected error while fetching favorite: ${err.message}`);
+            res.status(err.status).json({ error: err.message });
+        }
     }
 }
