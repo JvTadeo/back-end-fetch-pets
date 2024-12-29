@@ -11,7 +11,7 @@ export class AuthController {
     constructor() {
         this.supabaseService = new AuthService();
 
-        // Use o bind para garantir que o this seja o mesmo dentro do método
+        // Use o bind para garantir que o this seja o mesmo dentro do metodo
         this.signIn = this.signIn.bind(this);
         this.signOut = this.signOut.bind(this);
         this.signUp = this.signUp.bind(this);
@@ -31,21 +31,22 @@ export class AuthController {
         const {data:loginData, error:loginError } = await this.supabaseService.signInWithPassword(email, password);
 
         if (loginError) {
-            res.status(400).json({ error: loginError });
+            res.status(loginError.status).json({ error: loginError });
             return
         }
 
         const { data, error } = await this.supabaseService.getUser(loginData.session.access_token);
 
         if (error) {
-            res.status(400).json({ error: error.message });
+            res.status(error.status).json({ error: error.message });
             return;
         }
 
         userData.setToken(loginData.session.access_token);
         userData.setUserData(data);
 
-        res.status(200).json({ user: userData.getUserData() });
+        res.status(200).json({ user:
+                userData.getUserData() });
     }
 
     public async signOut(req: Request, res: Response) : Promise<void> {
@@ -58,7 +59,7 @@ export class AuthController {
         const { error } = await this.supabaseService.signOut(token);
 
         if (error) {
-            res.status(400).json({ error: error.message });
+            res.status(error.status).json({ error: error.message });
             return;
         }
 
@@ -74,7 +75,7 @@ export class AuthController {
         // Verificando se ocorreu algum erro
         if (error) {
             logger.error(error.message);
-            res.status(400).json({ error: error.message });
+            res.status(error.status).json({ error: error.message });
             return;
         }
 
@@ -90,7 +91,7 @@ export class AuthController {
 
         if (errorCreateUser) {
             logger.error(errorCreateUser.message);
-            res.status(400).json({ error: errorCreateUser.message });
+            res.status(errorCreateUser.status).json({ error: errorCreateUser.message });
             return;
         }
 
@@ -111,7 +112,7 @@ export class AuthController {
         const { data, error } = await this.supabaseService.getUser(token);
 
         if (error) {
-            res.status(400).json({ error: error.message });
+            res.status(error.status).json({ error: error.message });
             return;
         }
 
@@ -132,7 +133,7 @@ export class AuthController {
         const { data, error } = await this.supabaseService.getUser(token);
 
         if (error) {
-            res.status(400).json({ error: error.message });
+            res.status(error.status).json({ error: error.message });
             return;
         }
 
@@ -145,7 +146,7 @@ export class AuthController {
         const { error } = await this.supabaseService.requestPasswordReset(email);
 
         if (error) {
-            res.status(400).json({ error: error.message });
+            res.status(error.status).json({ error: error.message });
             return;
         }
 
@@ -158,7 +159,7 @@ export class AuthController {
         const { error } = await this.supabaseService.resetPassword(email, password, user);
 
         if (error) {
-            res.status(400).json({ error: error.message });
+            res.status(error.status).json({ error: error.message });
             return;
         }
 
@@ -177,7 +178,7 @@ export class AuthController {
         const { data, error } = await this.supabaseService.verifyTokenOPT(verifyOtpParams);
 
         if (error) {
-            res.status(400).json({ error: error.message });
+            res.status(error.status).json({ error: error.message });
             return;
         }
 
@@ -190,7 +191,7 @@ export class AuthController {
         const { data, error } = await this.supabaseService.saveImageToSupabase(image, token, uid);
 
         if (error) {
-            res.status(400).json({ error: error.message });
+            res.status(error.status).json({ error: error.message });
             return;
         }
         res.status(200).json({ data });

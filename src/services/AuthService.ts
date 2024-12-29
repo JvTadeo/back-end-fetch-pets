@@ -1,27 +1,16 @@
-import { VerifyOtpParams, UserAttributes} from "@supabase/supabase-js";
-import { createClient } from "@supabase/supabase-js";
+import {VerifyOtpParams, UserAttributes, SignOut} from "@supabase/supabase-js";
+import { createClient } from '@supabase/supabase-js';
 import { User } from "../models/User";
 import dotenv from "dotenv";
-import fs from "fs";
+import {BaseService} from "./BaseService";
 
 // Load environment variables
 dotenv.config();
 
-export class AuthService {
-
-    // Criando um SupaBaseService
-    private createAuthenticatedClient(token: string) {
-        return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY, {
-            global: {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            }
-        });
-    }
+export class AuthService extends BaseService {
 
     public async signInWithPassword(email: string, password: string) : Promise<{ data: any; error: any }> {
-        const supabase = this.createAuthenticatedClient("");
+        const supabase = await this.createAuthenticatedClient("");
         const { data, error } = await supabase.auth.signInWithPassword({
             email: email,
             password: password,
@@ -29,14 +18,14 @@ export class AuthService {
         return { data, error };
     }
 
-    public async signOut(token) : Promise<{ data: any; error: any }> {
-        const supabase = this.createAuthenticatedClient(token);
-        const { error } = await supabase.auth.signOut(token);
+    public async signOut(token: string) : Promise<{ data: any; error: any }> {
+        const supabase = await this.createAuthenticatedClient(token);
+        const { error } = await supabase.auth.signOut(token as SignOut);
         return { data: null, error };
     }
 
     public async signUp(email: string, password: string) : Promise<{ data: any; error: any }> {
-        const supabase = this.createAuthenticatedClient("");
+        const supabase = await this.createAuthenticatedClient("");
         const { data, error } = await supabase.auth.signUp({
             email: email,
             password: password,
@@ -45,7 +34,7 @@ export class AuthService {
     }
 
     public async getUserData(id : string, token: string) : Promise<{ data: any; error: any }> {
-        const supabase = this.createAuthenticatedClient(token);
+        const supabase = await this.createAuthenticatedClient(token);
 
         const { data, error } = await supabase
         .from('users')
@@ -56,7 +45,7 @@ export class AuthService {
     }
 
     public async getUser(token: string) : Promise<{ data: any; error: any }> {
-        const supabase = this.createAuthenticatedClient(token);
+        const supabase = await this.createAuthenticatedClient(token);
         const { data:user, error:userErro } = await supabase.auth.getUser(token);
         
         if (userErro) {
@@ -69,7 +58,7 @@ export class AuthService {
     }
 
     public async requestPasswordReset(email: string) : Promise<{ error: any }> {
-        const supabase = this.createAuthenticatedClient('');
+        const supabase = await this.createAuthenticatedClient('');
         const { error } = await supabase.auth.resetPasswordForEmail(email);
         if (error) {
             return { error };
@@ -78,7 +67,7 @@ export class AuthService {
     }
 
     public async verifyTokenOPT(token: VerifyOtpParams) : Promise<{ data: any; error: any }> {
-        const supabase = this.createAuthenticatedClient('');
+        const supabase = await this.createAuthenticatedClient('');
 
         const { data, error } = await supabase.auth.verifyOtp(token)
         
@@ -86,9 +75,9 @@ export class AuthService {
     }
 
     public async resetPassword(email:string, password: string, user: Object) : Promise<{ data: any; error: any }> {
-        const supabase = this.createAuthenticatedClient("");
+        const supabase = await this.createAuthenticatedClient("");
 
-        supabase.auth.setSession({
+        await supabase.auth.setSession({
             access_token: user["access_token"],
             refresh_token: user["refresh_token"],
         });
@@ -104,7 +93,10 @@ export class AuthService {
     }
 
     public async updateUserDb(user: User, token: string, uid: string) : Promise<{ data: any; error: any }> {
-        const supabase = this.createAuthenticatedClient(token);
+        const supabase = await this.createAuthenticatedClient(token);
+
+        const dateObj = new Date(user.birthDate);
+        const date = `${dateObj.getDate().toString().padStart(2, '0')}/${(dateObj.getMonth() + 1).toString().padStart(2, '0')}/${dateObj.getFullYear()}`;
         
         const { data, error } = await supabase
         .from('users')
@@ -127,7 +119,7 @@ export class AuthService {
     }
 
     public async saveImageToSupabase(image: any, token: string, uid: string) : Promise<{ data: any; error: any }> {
-        const supabase = this.createAuthenticatedClient(token);
+        const supabase = await this.createAuthenticatedClient(token);
 
         const { data, error } = await supabase
         .from('users')

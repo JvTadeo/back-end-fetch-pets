@@ -1,45 +1,56 @@
 import {Request, Response} from "express-serve-static-core";
 import logger from "../utils/logger";
-import {AuthService} from "../services/AuthService";
+import { AuthService } from "../services/AuthService";
+import { CustomError } from "../middlewares/errorMiddleware";
 
 export abstract class BaseController {
     protected abstract loggerContext: string;
-    protected supaBaseService: AuthService;
+    protected supabaseService: AuthService;
 
     protected constructor() {
-        this.supaBaseService = new AuthService();
+        this.supabaseService = new AuthService();
     }
 
     protected async handleResponse(
         res: Response,
-        data: any,
-        success: boolean,
-        error: any,
-        successMessage: string
-    ): Promise<void> {
-        if (error) {
-            logger.error(`[${this.loggerContext}] Error: ${error.message}`);
-            res.status(400).json({ error: error.message });
-        } else if (!success) {
-            logger.warn(`[${this.loggerContext}] ${successMessage} not found`);
-            res.status(404).json({ error: `${successMessage} not found` });
-        } else {
-            logger.info(`[${this.loggerContext}] ${successMessage}`);
-            res.status(200).json({ data, message: successMessage });
+        options: {
+            data?: any;
+            success: boolean;
+            error?: { message: string; status: number };
+            message: string;
+            entity: string;
         }
+    ): Promise<Response<any, Record<string, any>, number>> {
+        const { data, success, error, message, entity } = options;
+
+        if (error) {
+            // Log de erro
+            logger.error(`[${this.loggerContext}] Error: ${error.message}`);
+            return res.status(error.status || 500).json({ error: error.message });
+        }
+
+        if (!success) {
+            // Log de warning
+            logger.warn(`[${this.loggerContext}] ${entity} not found`);
+            return res.status(404).json({ error: `${entity} not found` });
+        }
+
+        // Log de sucesso
+        logger.info(`[${this.loggerContext}] ${message}`);
+        return res.status(200).json({ data, message });
     }
 
+    // Sample: BaseController.ts
     protected async getToken(req: Request): Promise<string> {
         const authorization = req.headers.authorization;
         if (!authorization) {
-            logger.error(`[${this.loggerContext}] Authorization header is missing`);
-            throw new Error("Authorization header is missing");
+            throw new CustomError("Authorization header is missing", 401);
         }
         return authorization.split(' ')[1];
     }
 
     protected async getUserId(token: string): Promise<number> {
-        const { data } = await this.supaBaseService.getUser(token)
-        return data.user.id
+        const { data } = await this.supabaseService.getUser(token)
+        return data.id
     }
 }

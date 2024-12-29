@@ -1,22 +1,12 @@
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import logger from "../utils/logger";
 import { Message } from "../interfaces/MessageInterface";
 import { MessageServiceInterface } from '../interfaces/MessageServiceInterface';
+import {BaseService} from "./BaseService";
 
-export class MessageService implements MessageServiceInterface {
-
-    private createAuthenticatedClient(token: string): SupabaseClient {
-        return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY, {
-            global: {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            }
-        });
-    }
+export class MessageService extends BaseService implements MessageServiceInterface {
 
     public async get(chat_id: string, token: string): Promise<{ data: Message[]; error: any }> {
-        const supabase = this.createAuthenticatedClient(token);
+        const supabase = await this.createAuthenticatedClient(token);
         console.log(chat_id);
         const { data, error } = await supabase
             .from('messages')
@@ -33,7 +23,7 @@ export class MessageService implements MessageServiceInterface {
     }
 
     public async create(message: Message, token: string): Promise<{ data: Message, error: any }> {
-        const supabase = this.createAuthenticatedClient(token);
+        const supabase = await this.createAuthenticatedClient(token);
         const { data, error } = await supabase
             .from('messages')
             .insert([message])
@@ -47,7 +37,7 @@ export class MessageService implements MessageServiceInterface {
     }
 
     public async getConversations(userId: string, token: string): Promise<{ data: any[]; error: any }> {
-        const supabase = this.createAuthenticatedClient(token);
+        const supabase = await this.createAuthenticatedClient(token);
         const { data, error } = await supabase
             .from('messages')
             .select('chat_id, sender_id, receiver_id, receiver:messages_receiver_id_fkey(name)')
