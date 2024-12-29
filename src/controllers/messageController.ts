@@ -68,6 +68,7 @@ export class MessageController extends BaseController implements MessageControll
             }
             const token = await this.getToken(req);
             const { data, error } = await this.messageService.getConversations(userId, token);
+            console.log(data)
             await this.handleResponse(res, {
                 data,
                 success: !!data && !error,

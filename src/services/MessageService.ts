@@ -40,7 +40,7 @@ export class MessageService extends BaseService implements MessageServiceInterfa
         const supabase = await this.createAuthenticatedClient(token);
         const { data, error } = await supabase
             .from('messages')
-            .select('chat_id, sender_id, receiver_id, receiver:messages_receiver_id_fkey(name)')
+            .select('chat_id, sender_id, receiver_id, content, receiver:messages_receiver_id_fkey(name)')
             .or(`sender_id.eq.${userId}, receiver_id.eq.${userId}`)
             .order('created_at', { ascending: false });
 
@@ -52,7 +52,7 @@ export class MessageService extends BaseService implements MessageServiceInterfa
         const uniqueChats = data ? data.reduce((acc, curr) => {
             const otherUser = curr.sender_id === userId ? curr.receiver_id : curr.sender_id;
             if (!acc[otherUser]) {
-                acc[otherUser] = { chat_id: curr.chat_id, contactId: otherUser, contactName: curr.receiver['name'] };
+                acc[otherUser] = { chat_id: curr.chat_id, contactId: otherUser, contactName: curr.receiver['name'], content: curr.content };
             }
             return acc;
         }, []) : [];

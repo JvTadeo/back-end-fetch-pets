@@ -24,23 +24,19 @@ export abstract class BaseController {
         const { data, success, error, message, entity } = options;
 
         if (error) {
-            // Log de erro
             logger.error(`[${this.loggerContext}] Error: ${error.message}`);
             return res.status(error.status || 500).json({ error: error.message });
         }
 
         if (!success) {
-            // Log de warning
             logger.warn(`[${this.loggerContext}] ${entity} not found`);
             return res.status(404).json({ error: `${entity} not found` });
         }
 
-        // Log de sucesso
         logger.info(`[${this.loggerContext}] ${message}`);
         return res.status(200).json({ data, message });
     }
 
-    // Sample: BaseController.ts
     protected async getToken(req: Request): Promise<string> {
         const authorization = req.headers.authorization;
         if (!authorization) {

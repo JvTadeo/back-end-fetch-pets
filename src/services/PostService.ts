@@ -58,7 +58,7 @@ export class PostService extends BaseService {
             .select();
 
         if (error) {
-            logger.error('Error fetching all posts, error: ${error.message}');
+            logger.error(`Error fetching all posts, error: ${error.message}`);
         }
         return { data, error };
     }
@@ -71,7 +71,7 @@ export class PostService extends BaseService {
             .eq('adopter', uid);
 
         if (error) {
-            logger.error('Error fetching all adopted posts, error: ${error.message}');
+            logger.error(`Error fetching all adopted posts, error: ${error.message}`);
         }
         return { data, error };
     }
