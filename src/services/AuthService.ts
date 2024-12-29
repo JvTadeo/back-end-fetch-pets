@@ -105,9 +105,6 @@ export class AuthService {
 
     public async updateUserDb(user: User, token: string, uid: string) : Promise<{ data: any; error: any }> {
         const supabase = this.createAuthenticatedClient(token);
-
-        const dateObj = new Date(user.birthDate);
-        const date = `${dateObj.getDate().toString().padStart(2, '0')}/${(dateObj.getMonth() + 1).toString().padStart(2, '0')}/${dateObj.getFullYear()}`;
         
         const { data, error } = await supabase
         .from('users')
@@ -117,10 +114,11 @@ export class AuthService {
             address: user.address,
             phoneNumber: user.phone,
             gender: user.gender,
-            birthDate: date,
+            birthDate: user.birthDate,
             zip: user.zip,
             stateAndCity: user.stateAndCity,
             image: user.image,
+            houseNumber: user.houseNumber,
         })
         .eq('id', uid)
         .select();
@@ -142,6 +140,21 @@ export class AuthService {
         return { data, error };
     }
 
+    public async uploadEmailPassword(email: string, password: string, uid: string) : Promise<{ data: any; error: any }> {
+        const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ROLE_KEY)
+
+        const { data, error } = await supabase.auth.admin.updateUserById(uid, {
+            email: email
+        })
+
+        if (password?.length > 0) {
+            const { data: dataPass, error: errorPass } = await supabase.auth.admin.updateUserById(uid, {
+                password: password
+            })
+        }
+
+        return { data, error}
+    }
     // public async uploadImage(image: Image, token: string) : Promise<{ data: any; error: any }> {
     //     const file = fs.readFileSync(image.path);
 

@@ -197,6 +197,35 @@ export class AuthController {
     }
 
     public async updateUser(req: Request, res: Response) : Promise<void> {
+        const { email, password, id, houseNumber } = req.body;
+        const userData : User = req.body;
+        const token = req.headers.authorization?.split(' ')[1];
 
+        userData.houseNumber = houseNumber.toString();
+        
+        console.log(`HouseNumber: ${userData.houseNumber}\nAniversario ${userData.birthDate}`);
+
+        if (!token) {
+            res.status(400).json({ error: "Token not provided" });
+            return;
+        }
+
+        const { error:emailPassError } = await this.supabaseService.uploadEmailPassword(email, password, id);
+
+        if (emailPassError) {
+            res.status(400).json({ error: emailPassError.message });
+            return;
+        }
+        console.log(`Update E-mail`)
+
+        const { error:updateUserError } = await this.supabaseService.updateUserDb(userData, token, id);
+
+        if (updateUserError) {
+            res.status(400).json({ error: updateUserError.message });
+            return;
+        }
+        console.log(`Update User`)
+
+        res.status(200).json({ message: "User updated"});
     }
 }

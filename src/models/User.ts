@@ -3,7 +3,7 @@ export class User {
     email: string;
     password: string;
     confirmPassword: string;
-    phone: string;
+    phoneNumber: string;
     birthDate: Date;
     gender: string;
     address: string;
@@ -11,14 +11,14 @@ export class User {
     zip: string;
     image: string;
     politycs: boolean;
-    houseNumber: number;
+    houseNumber: string;
 
     constructor(
         name: string = "",
         email: string = "",
         password: string = "",
         confirmPassword: string = "",
-        phone: string = "",
+        phoneNumber: string = "",
         birthDate: Date,
         gender: string = "",
         address: string = "",
@@ -26,13 +26,13 @@ export class User {
         zip: string = "",
         image: string = "",
         politycs: boolean = false,
-        houseNumber = 0
+        houseNumber = '0'
     ) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.confirmPassword = confirmPassword;
-        this.phone = phone;
+        this.phoneNumber = phoneNumber;
         this.birthDate = birthDate;
         this.gender = gender;
         this.address = address;
