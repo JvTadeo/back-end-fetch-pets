@@ -2,8 +2,8 @@ import { PostService } from "../services/PostService";
 import { Request, Response } from "express-serve-static-core";
 import logger from "../utils/logger";
 import multer from "multer";
-import { determineFilePath } from "../services/imageService"
 import {BaseController} from "./BaseController";
+import { Post } from "../interfaces/PostInterface";
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -119,53 +119,30 @@ export class PostController extends BaseController {
     }
 
     public async createPost(req: Request, res: Response): Promise<void> {
-        try {
-            logger.info('Creating a new post');
-            const token = await this.getToken(req);
+        const token = await this.getToken(req);
 
-            // Usa `upload.single` para capturar um único arquivo no campo `file`
-            upload.single('file')(req, res, async (err) => {
-                if (err) {
-                    logger.error(`Error uploading file: ${err.message}`);
-                    return res.status(400).json({ error: err.message });
-                }
-
-                const post = req.body;
-                const file = req.file;
-
-                if (file) {
-                    const { buffer, originalname, mimetype } = file;
-
-                    try {
-                        const { isImage, filePath } = determineFilePath(mimetype);
-                        const { data, error } = await this.postService.uploadFile(buffer, filePath, mimetype, isImage, token);
-
-                        if (error) {
-                            logger.error(`Error: ${error.message}`);
-                            return res.status(400).json({ error: error.message });
-                        }
-
-                        post.file = data.path;
-                    } catch (e) {
-                        logger.error(`Error uploading file to Supabase: ${e.message}`);
-                        return res.status(500).json({ error: 'Error uploading file to storage.' });
-                    }
-                }
-
-                const { data, error } = await this.postService.create(post, token);
-
-                await this.handleResponse(res, {
-                    data,
-                    success: !!data && !error,
-                    error: error ? { message: error.message, status: error.status || 400 } : undefined,
-                    message: 'Post created successfully',
-                    entity: 'Post',
-                })
-            });
-        } catch (err) {
-            logger.error(`Unexpected error while creating post: ${err.message}`);
-            res.status(err.status).json({ error: err.message });
+        const post : Post = {
+            pet_name: req.body.petName,
+            sex: req.body.sex,
+            species: req.body.species,
+            breed: req.body.breed,
+            age: req.body.age,
+            weight_kg: req.body.weight,
+            health_status: req.body.healthStatus,
+            behavior: req.body.behavior,
+            special_preferences: req.body.specialPreferences,
+            opt_in: req.body.isConfirmed,
+            image: req.body.image,
+            userId: req.body.userId
         }
+        const { error} = await this.postService.create(post, token);
+
+        if (error) {
+            res.status(400).json({ error: error.message });
+            return;
+        }
+        
+        res.status(201).json({ message: "Post created successfully"});
     }
 
 

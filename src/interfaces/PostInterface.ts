@@ -1,7 +1,5 @@
 export interface Post {
-    id: number;
-    body: string;
-    file: File;
+    id?: number;
     userId: number;
     pet_name: string;
     sex: "Macho" | "Fêmea";
@@ -13,4 +11,5 @@ export interface Post {
     behavior: string;
     special_preferences: string;
     opt_in: boolean;
+    image: string,
 }
