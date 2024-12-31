@@ -22,20 +22,24 @@ export class MessageController extends BaseController implements MessageControll
         try {
             logger.info(`Fetching messages for user with id ${req.params.id}`);
             const { chat_id } = req.params;
+            const { limit, offset } = req.query;
             const token = await this.getToken(req);
-            const { data, error } = await this.messageService.get(chat_id, token);
+
+            const { data, error } = await this.messageService.get(chat_id, token, Number(limit), Number(offset));
+
             await this.handleResponse(res, {
                 data,
                 success: !!data && !error,
                 error: error ? { message: error.message, status: error.status || 404 } : undefined,
                 message: 'Messages retrieved successfully',
                 entity: 'Message',
-            })
+            });
         } catch (err) {
             logger.error(`Unexpected error while fetching messages: ${err.message}`);
             res.status(500).json({ error: 'Internal server error' });
         }
     }
+
 
     public async sendMessage(req: Request, res: Response): Promise<void> {
         try {
@@ -68,7 +72,7 @@ export class MessageController extends BaseController implements MessageControll
             }
             const token = await this.getToken(req);
             const { data, error } = await this.messageService.getConversations(userId, token);
-            console.log(data)
+
             await this.handleResponse(res, {
                 data,
                 success: !!data && !error,
