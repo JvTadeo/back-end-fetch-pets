@@ -19,9 +19,8 @@ export class FavoriteController extends BaseController {
     public async create(req: Request, res: Response): Promise<void> {
         try {
             logger.info(`Adding post with id ${req.params.id} to favorites`);
-            const { postId } = req.body;
+            const { postId, userId } = req.body;
             const token = await this.getToken(req);
-            const userId = await this.getUserId(token);
             const favorite = { created_at: new Date(), postId: Number(postId), userId, };
             const { data, error } = await this.favoriteService.create(favorite, token);
 
