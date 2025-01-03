@@ -113,6 +113,7 @@ export class PostService extends BaseService {
 
     public async update(post: Post, token: string): Promise<{ data: Post; error: any }> {
         const supabase = await this.createAuthenticatedClient(token);
+
         const { data, error } = await supabase
             .from('posts')
             .update(post)

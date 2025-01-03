@@ -151,8 +151,22 @@ export class PostController extends BaseController {
     public async updatePost(req: Request, res: Response): Promise<void> {
         try {
             logger.info(`Updating post by id: ${req.params.id}`);
-            const post = req.body;
-            post.id = req.params.id;
+            const post : Post = {
+                age: req.body.age,
+                breed: req.body.breed,
+                behavior: req.body.behavior,
+                image: req.body.image,
+                health_status: req.body.healthStatus,  
+                opt_in: req.body.isConfirmed,
+                pet_name: req.body.petName,
+                sex: req.body.sex,
+                special_preferences: req.body.specialPreferences,
+                species: req.body.species,
+                userId: req.body.userId,
+                weight_kg: req.body.weight
+            }
+            post.id = Number(req.params.id);
+
             const token = await this.getToken(req);
             const { data, error } = await this.postService.update(post, token);
             await this.handleResponse(res, {

@@ -12,4 +12,5 @@ export interface Post {
     special_preferences: string;
     opt_in: boolean;
     image: string,
+    adopter?: string;
 }
