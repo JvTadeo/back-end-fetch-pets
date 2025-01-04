@@ -162,7 +162,8 @@ export class PostController extends BaseController {
                 special_preferences: req.body.specialPreferences,
                 species: req.body.species,
                 userId: req.body.userId,
-                weight_kg: req.body.weight
+                weight_kg: req.body.weight,
+                adopter: req.body.adopter
             }
             post.id = Number(req.params.id);
 
