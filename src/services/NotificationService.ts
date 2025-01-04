@@ -25,7 +25,7 @@ export class NotificationService extends BaseService {
         let query = supabase
             .from('notifications')
             .select("*, receiver:receiverId(name), sender:senderId(name)")
-            .eq('receiverId', id);
+            .eq('receiverId', id).order('read', { ascending: true }).order('created_at', { ascending: false });
 
         // Verifica se `filters` possui a propriedade `species` e ela não é nula
         if (filters && 'read' in filters && filters.read !== null) {
