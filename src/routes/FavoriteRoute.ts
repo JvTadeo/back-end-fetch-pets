@@ -7,6 +7,7 @@ const favoriteController = new FavoriteController();
 favoriteRouter.post('/', favoriteController.create);
 favoriteRouter.delete('/:id', favoriteController.delete);
 favoriteRouter.get('/:id', favoriteController.getById);
+favoriteRouter.get('/post/:id', favoriteController.getByPostId);
 favoriteRouter.get('/user/:id', favoriteController.getByUser);
 
 export default favoriteRouter;

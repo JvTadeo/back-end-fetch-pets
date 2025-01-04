@@ -5,4 +5,5 @@ export interface FavoriteServiceInterface {
     delete(id: string, token: string): Promise<{ data: Favorite; error: any }>;
     getByUserId(id: string, token: string): Promise<{ data: Favorite[]; error: any }>;
     getById(id: string, token: string): Promise<{ data: Favorite[]; error: any }>;
+    getByPostId(id: string, userId: string, token: string): Promise<{ data: Favorite[]; error: any }>;
 }

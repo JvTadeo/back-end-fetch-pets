@@ -6,6 +6,6 @@ export interface INotification {
     senderId: UUID;
     receiverId: UUID;
     data: string;
-    read: boolean;
-    created_at: Date;
+    read?: boolean;
+    created_at?: Date;
 }

@@ -60,4 +60,19 @@ export class FavoriteService extends BaseService implements FavoriteServiceInter
         }
         return { data, error };
     }
+
+    public async getByPostId(id: string, userId, token: string): Promise<{ data: Favorite[]; error: any }> {
+        const supabase = await this.createAuthenticatedClient(token);
+        const { data, error } = await supabase
+            .from('postLikes')
+            .select()
+            .eq('postId', id).eq('userId', userId);
+
+        console.log(data);
+
+        if (error) {
+            logger.error(`Error getting favorites by ID, error: ${error.message}`);
+        }
+        return { data, error };
+    }
 }

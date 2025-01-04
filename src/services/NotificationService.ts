@@ -24,7 +24,7 @@ export class NotificationService extends BaseService {
         const supabase = await this.createAuthenticatedClient(token);
         let query = supabase
             .from('notifications')
-            .select()
+            .select("*, receiver:receiverId(name), sender:senderId(name)")
             .eq('receiverId', id);
 
         // Verifica se `filters` possui a propriedade `species` e ela não é nula
