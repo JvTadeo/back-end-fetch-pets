@@ -101,8 +101,7 @@ export class FavoriteController extends BaseController {
     public async getByPostId(req: Request, res: Response): Promise<void> {
         try {
             logger.info(`Fetching favorite with id ${req.params.id}`);
-            const { id } = req.params;
-            const { userId } = req.body;
+            const { id, userId } = req.params;
             const token = await this.getToken(req);
             const { data, error } = await this.favoriteService.getByPostId(id, userId, token);
 

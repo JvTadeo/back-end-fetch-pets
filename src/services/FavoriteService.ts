@@ -61,7 +61,7 @@ export class FavoriteService extends BaseService implements FavoriteServiceInter
         return { data, error };
     }
 
-    public async getByPostId(id: string, userId, token: string): Promise<{ data: Favorite[]; error: any }> {
+    public async getByPostId(id: string, userId: string, token: string): Promise<{ data: Favorite[]; error: any }> {
         const supabase = await this.createAuthenticatedClient(token);
         const { data, error } = await supabase
             .from('postLikes')
