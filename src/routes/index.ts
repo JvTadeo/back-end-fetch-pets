@@ -5,6 +5,7 @@ import userRouter from './UserRoute';
 import postRouter from "./PostRoute";
 import favoriteRouter from './FavoriteRoute';
 import messageRouter from './MessageRoute';
+import notificationRouter from './NotificationRoute';
 import {join} from "node:path";
 
 const router = Router();
@@ -18,5 +19,6 @@ router.use('/users', userRouter);
 router.use('/posts', postRouter);
 router.use('/favorites', favoriteRouter);
 router.use('/messages', messageRouter);
+router.use('/notifications', notificationRouter);
 
 export default router;

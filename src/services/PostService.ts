@@ -5,25 +5,6 @@ import {BaseService} from "./BaseService";
 
 export class PostService extends BaseService {
 
-    // Criar função para deletar imagem após post ser deletado
-    // public async uploadFile(buffer: Buffer, filePath: string, contentType: string, isImage: boolean = true, token: string): Promise<{ data: any; error: any }> {
-    //     const supabase = await this.createAuthenticatedClient(token);
-    //     filePath = getFilePath(filePath, isImage)
-    //     const { data, error } = await supabase.storage
-    //         .from('uploads')
-    //         .upload(filePath, buffer, {
-    //             contentType,
-    //             cacheControl: '3600',
-    //             upsert: true,
-    //         });
-
-    //     if (error) {
-    //         logger.error(`Error uploading file to Supabase: ${error.message}`);
-    //     }
-    //     logger.info(`Success a storage image: ${data}`);
-    //     return { data, error };
-    // }
-
     public async getById(id: string, token: string): Promise<{ data: Post; error: any }> {
         const supabase = await this.createAuthenticatedClient(token);
         const {data, error} = await supabase

@@ -7,7 +7,7 @@ const postController = new PostController();
 postRouter.post('/', postController.createPost);
 postRouter.get('/', postController.getAllPosts);
 postRouter.get('/:id', postController.getPostById);
-postRouter.patch('/:id', postController.updatePost)
+postRouter.patch('/:id', postController.updatePost);
 postRouter.delete('/:id', postController.deletePost);
 postRouter.get('/user/:id', postController.getPostsByUser);
 postRouter.get('/adopted/:id', postController.getAdoptedPosts);

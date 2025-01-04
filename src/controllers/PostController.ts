@@ -66,7 +66,6 @@ export class PostController extends BaseController {
         try {
             logger.info('Fetching all posts');
             const filters = req.query;
-            console.log(filters);
             const token = await this.getToken(req);
             const { data, error } = await this.postService.getAll(token, filters);
             await this.handleResponse(res, {
