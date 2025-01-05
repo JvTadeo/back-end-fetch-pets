@@ -12,6 +12,7 @@ export class FavoriteController extends BaseController {
         this.favoriteService = new FavoriteService();
         this.create = this.create.bind(this);
         this.getById = this.getById.bind(this);
+        this.getByPostIdUserId = this.getByPostIdUserId.bind(this);
         this.getByPostId = this.getByPostId.bind(this);
         this.getByUser = this.getByUser.bind(this);
         this.delete = this.delete.bind(this);
@@ -98,12 +99,32 @@ export class FavoriteController extends BaseController {
         }
     }
 
-    public async getByPostId(req: Request, res: Response): Promise<void> {
+    public async getByPostIdUserId(req: Request, res: Response): Promise<void> {
         try {
             logger.info(`Fetching favorite with id ${req.params.id}`);
             const { id, userId } = req.params;
             const token = await this.getToken(req);
-            const { data, error } = await this.favoriteService.getByPostId(id, userId, token);
+            const { data, error } = await this.favoriteService.getByPostIdUserId(id, userId, token);
+
+            await this.handleResponse(res, {
+                data,
+                success: !!data && !error,
+                error: error ? { message: error.message, status: error.status || 404 } : undefined,
+                message: 'Favorite retrieved successfully',
+                entity: 'Favorite',
+            });
+        } catch (err) {
+            logger.error(`Unexpected error while fetching favorite: ${err.message}`);
+            res.status(err.status).json({ error: err.message });
+        }
+    }
+    
+    public async getByPostId(req: Request, res: Response): Promise<void> {
+        try {
+            logger.info(`Fetching favorite with id ${req.params.id}`);
+            const { id } = req.params;
+            const token = await this.getToken(req);
+            const { data, error } = await this.favoriteService.getByPostId(id, token);
 
             await this.handleResponse(res, {
                 data,
